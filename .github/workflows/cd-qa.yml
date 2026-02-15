@@ -50,6 +50,19 @@ jobs:
           ibmcloud target -g Default
           ibmcloud ce project select --name ${{ env.CE_PROJECT }}
 
+      - name: Ensure Registry Secret Exists
+        run: |
+          if ! ibmcloud ce registry get --name ibm-consulting-secret > /dev/null 2>&1; then
+            echo "Creating registry secret..."
+            ibmcloud ce registry create \
+              --name ibm-consulting-secret \
+              --server ${{ env.REGISTRY }} \
+              --username iamapikey \
+              --password ${{ secrets.IBM_CLOUD_API_KEY }}
+          else
+            echo "Registry secret already exists."
+          fi
+
       - name: Deploy Backend QA
         run: |
           if ibmcloud ce app get --name ibm-consulting-api-qa > /dev/null 2>&1; then
