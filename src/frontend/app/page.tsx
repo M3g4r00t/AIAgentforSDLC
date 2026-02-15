@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { ArrowRight, BarChart3, Brain, Cloud, Shield, Globe, Zap } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
+import { usePersona } from '@/context/PersonaContext';
 
 // ─── Animated Counter Component (inline for homepage) ───────
 function AnimatedCounter({ end, suffix = '', duration = 2000 }: { end: number; suffix?: string; duration?: number }) {
@@ -51,7 +52,27 @@ const capabilities = [
     { icon: BarChart3, title: 'Data & Analytics', desc: 'Unlock value with modern data platforms.', color: 'from-amber-500 to-orange-600' },
 ];
 
+const PERSONA_CONTENT = {
+    default: {
+        headline: <>Orchestrate <span className="text-transparent bg-clip-text bg-gradient-to-r from-ibm-blue to-ibm-purple">AI at Scale</span></>,
+        subhead: "IBM Consulting® is where trusted expertise meets powerful technology. We advise, design, build, and operate business innovation that matters.",
+    },
+    cfo: {
+        headline: <>Maximize Value. <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-400">Minimize Risk.</span></>,
+        subhead: "Transform finance operations with AI-driven insights. Reduce costs, optimize cash flow, and drive profitable growth with IBM Consulting.",
+    },
+    cto: {
+        headline: <>Build the Future. <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-fuchsia-500">Scale with AI.</span></>,
+        subhead: "Modernize your architecture with hybrid cloud and generative AI. Secure, scalable, and built for the next generation of business.",
+    },
+    cmo: {
+        headline: <>Captivate Audiences. <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-rose-500">Drive Growth.</span></>,
+        subhead: "Reimagine customer experiences (iX) with data and design. Create personalized journeys that convert and retain.",
+    }
+};
+
 export default function HomePage() {
+    const { persona } = usePersona(); // Hook from context
     const [insights, setInsights] = useState<any[]>([]);
 
     useEffect(() => {
@@ -62,11 +83,27 @@ export default function HomePage() {
             .catch(() => { });
     }, []);
 
+    const content = PERSONA_CONTENT[persona] || PERSONA_CONTENT.default;
+
+    // Reorder capabilities based on persona
+    const getSortedCapabilities = () => {
+        const caps = [...capabilities];
+        if (persona === 'cfo') return caps.sort((a, b) => (a.title.includes('Data') ? -1 : 1));
+        if (persona === 'cto') return caps.sort((a, b) => (a.title.includes('Cloud') || a.title.includes('Cyber') ? -1 : 1));
+        if (persona === 'cmo') return caps.sort((a, b) => (a.title.includes('AI') ? -1 : 1)); // AI is key for personalization
+        return caps;
+    };
+
+    const displayCapabilities = getSortedCapabilities();
+
     return (
         <main className="min-h-screen">
             {/* ─── Hero Section ────────────────────────────── */}
-            <section className="relative min-h-[85vh] flex items-center overflow-hidden">
+            <section className="relative min-h-[85vh] flex items-center overflow-hidden transition-colors duration-700">
                 <div className="absolute inset-0 animated-gradient opacity-30" />
+                {/* Dynamic colored blobs based on theme are handled by globals.css vars if we used them, 
+                    but here we can also use conditional classes if desired. For now, sticking to the standard ones 
+                    but they could be 'bg-hero-dynamic' for more effect. */}
                 <div className="absolute top-20 right-20 w-96 h-96 bg-ibm-blue/20 rounded-full blur-3xl animate-float" />
                 <div className="absolute bottom-20 left-20 w-72 h-72 bg-ibm-purple/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '3s' }} />
 
@@ -78,15 +115,11 @@ export default function HomePage() {
                         </div>
 
                         <h1 className="text-5xl lg:text-7xl font-bold leading-tight mb-6">
-                            Orchestrate{' '}
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-ibm-blue to-ibm-purple">
-                                AI at Scale
-                            </span>
+                            {content.headline}
                         </h1>
 
                         <p className="text-xl lg:text-2xl text-gray-300 max-w-2xl mb-10 leading-relaxed">
-                            IBM Consulting® is where trusted expertise meets powerful technology.
-                            We advise, design, build, and operate business innovation that matters.
+                            {content.subhead}
                         </p>
 
                         <div className="flex flex-wrap gap-4">
@@ -126,7 +159,7 @@ export default function HomePage() {
                 </div>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {capabilities.map((cap, i) => (
+                    {displayCapabilities.map((cap, i) => (
                         <div key={i} className="glass-card p-6 rounded-xl hover:scale-105 transition-transform duration-300 group">
                             <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${cap.color} flex items-center justify-center mb-4`}>
                                 <cap.icon className="w-6 h-6 text-white" />

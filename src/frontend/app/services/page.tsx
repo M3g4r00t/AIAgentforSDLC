@@ -11,6 +11,7 @@ interface Service {
     icon: string;
     url?: string;
     image?: string;
+    partners?: string[];
 }
 
 const iconMap: Record<string, any> = {
@@ -111,6 +112,19 @@ export default function ServicesPage() {
                                         <p className="text-gray-400 mb-6 line-clamp-3">
                                             {service.description}
                                         </p>
+
+                                        {service.partners && service.partners.length > 0 && (
+                                            <div className="mb-6">
+                                                <p className="text-[10px] uppercase tracking-wider text-gray-500 mb-2 font-semibold">Technology Partners</p>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {service.partners.map((partner, p) => (
+                                                        <span key={p} className="text-xs bg-ibm-blue-60/20 text-ibm-blue-40 px-2 py-1 rounded border border-ibm-blue-60/30">
+                                                            {partner}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
 
                                         {tags.length > 0 && (
                                             <div className="flex flex-wrap gap-2 mb-6 mt-auto">

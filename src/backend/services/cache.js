@@ -52,6 +52,7 @@ function getStaticServices() {
             description: 'Transform your business model with data-driven strategy and AI-powered decision frameworks.',
             icon: 'strategy',
             image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=800&q=80',
+            partners: ['IBM watsonx', 'Microsoft OpenAI', 'Adobe']
         },
         {
             id: 'experience',
@@ -66,6 +67,7 @@ function getStaticServices() {
             description: 'Build robust, scalable platforms with hybrid cloud technology and modern engineering.',
             icon: 'code',
             image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=80',
+            partners: ['Microsoft Azure', 'AWS', 'Red Hat', 'Google Cloud']
         },
         {
             id: 'operations',

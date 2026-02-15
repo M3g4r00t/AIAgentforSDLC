@@ -9,6 +9,55 @@
     --gradient-hero: linear-gradient(135deg, #001141 0%, #0043ce 40%, #0f62fe 70%, #4589ff 100%);
     --glass-bg: rgba(22, 22, 22, 0.6);
     --glass-border: rgba(255, 255, 255, 0.08);
+    --foreground-rgb: 0, 0, 0;
+    --background-start-rgb: 214, 219, 220;
+    --background-end-rgb: 255, 255, 255;
+
+    /* Default Theme (Consulting Blue) */
+    --hero-gradient-from: #2563eb;
+    /* blue-600 */
+    --hero-gradient-via: #9333ea;
+    /* purple-600 */
+    --hero-gradient-to: #4f46e5;
+    /* indigo-600 */
+}
+
+/* CFO Theme (Trust/Finance/Emerald) */
+[data-theme='cfo'] {
+    --hero-gradient-from: #047857;
+    /* emerald-700 */
+    --hero-gradient-via: #0d9488;
+    /* teal-600 */
+    --hero-gradient-to: #0891b2;
+    /* cyan-600 */
+}
+
+/* CTO Theme (Tech/Cyber/Violet) */
+[data-theme='cto'] {
+    --hero-gradient-from: #7c3aed;
+    /* violet-600 */
+    --hero-gradient-via: #c026d3;
+    /* fuchsia-600 */
+    --hero-gradient-to: #db2777;
+    /* pink-600 */
+}
+
+/* CMO Theme (Creative/Vibrant/Rose) */
+[data-theme='cmo'] {
+    --hero-gradient-from: #f97316;
+    /* orange-500 */
+    --hero-gradient-via: #e11d48;
+    /* rose-500 */
+    --hero-gradient-to: #9333ea;
+    /* purple-600 */
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --foreground-rgb: 255, 255, 255;
+        --background-start-rgb: 0, 0, 0;
+        --background-end-rgb: 0, 0, 0;
+    }
 }
 
 html {
@@ -19,6 +68,15 @@ body {
     font-family: 'IBM Plex Sans', system-ui, sans-serif;
     background-color: #161616;
     color: #f4f4f4;
+    color: rgb(var(--foreground-rgb));
+    background: linear-gradient(to bottom,
+            transparent,
+            rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+}
+
+/* Utility to use the gradient */
+.bg-hero-dynamic {
+    background-image: linear-gradient(to right, var(--hero-gradient-from), var(--hero-gradient-via), var(--hero-gradient-to));
 }
 
 /* ─── Glass Card ──────────────────────────────── */

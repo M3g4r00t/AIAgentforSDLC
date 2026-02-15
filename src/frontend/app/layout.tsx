@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { Navbar } from '@/components/Navbar'
-import { Footer } from '@/components/Footer'
+import { Navbar } from '../components/Navbar'
+import { Footer } from '../components/Footer'
+import { PersonaProvider } from '../context/PersonaContext'
+import PersonaSwitcher from '../components/PersonaSwitcher'
+import StrategistWidget from '../components/StrategistWidget'
 
 export const metadata: Metadata = {
     title: 'IBM Consulting | Strategy, AI & Cloud Transformation',
@@ -15,10 +18,16 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en" className="dark">
-            <body className="bg-ibm-gray-100 text-ibm-gray-10 antialiased">
-                <Navbar />
-                <main className="min-h-screen">{children}</main>
-                <Footer />
+            <body className="bg-ibm-gray-100 text-ibm-gray-100 antialiased transition-colors duration-500">
+                <PersonaProvider>
+                    <Navbar />
+                    <main className="min-h-screen relative">
+                        {children}
+                        <PersonaSwitcher />
+                        <StrategistWidget />
+                    </main>
+                    <Footer />
+                </PersonaProvider>
             </body>
         </html>
     )

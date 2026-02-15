@@ -4,6 +4,7 @@ const path = require('path');
 require('dotenv').config();
 
 const contentCache = require('./services/cache');
+const strategistService = require('./services/strategist');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -85,6 +86,7 @@ app.get('/api/services', (req, res) => {
 });
 
 // ─── Contact form (mock) ────────────────────────────────────
+// ─── Contact form (mock) ────────────────────────────────────
 app.post('/api/contact', (req, res) => {
   const { name, email, company, message } = req.body;
 
@@ -94,6 +96,20 @@ app.post('/api/contact', (req, res) => {
 
   console.log(`[CONTACT] From: ${name} <${email}> | Company: ${company || 'N/A'}`);
   res.json({ success: true, message: 'Thank you for your inquiry. We will be in touch shortly.' });
+});
+
+// ─── Oracle API ─────────────────────────────────────────────
+app.post('/api/oracle/ask', async (req, res) => {
+  try {
+    const { query, persona } = req.body;
+    if (!query) return res.status(400).json({ error: 'Query is required' });
+
+    const response = await oracleService.askOracle(query, persona || 'default');
+    res.json(response);
+  } catch (error) {
+    console.error('Oracle Error:', error);
+    res.status(500).json({ error: 'Oracle unavailable' });
+  }
 });
 
 // ─── Error handling ─────────────────────────────────────────
