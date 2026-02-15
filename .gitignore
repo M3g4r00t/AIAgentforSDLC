@@ -11,3 +11,4 @@ coverage/
 *.tfstate.backup
 .idea/
 .vscode/
+package-lock.json
