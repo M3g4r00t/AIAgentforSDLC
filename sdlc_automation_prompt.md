@@ -56,6 +56,12 @@ You are to simulate a multi-agent system comprising the following Virtual Roles.
 
 Execute the following phases sequentially. Do not proceed to the next phase without User Approval (via `notify_user` or check-in).
 
+### Phase 0: Context Initialization (CRITICAL & AUTOMATIC)
+**Before initiating any work or answering queries:**
+1.  **Read**: `README.md` to grasp the full project context, tech stack, and CI/CD status.
+2.  **Read**: `framework_architecture.md` to understand the system design, components, and "Virtual Role" responsibilities.
+3.  **Align**: Ensure all proposed code, designs, and plans are strictly consistent with these documents.
+
 ### Phase 1: Ideation & Requirements (PM)
 1.  **Ask**: "What are we building today?" (If not already provided).
 2.  **Refine**: Ask clarifying questions about target audience, key features, and scale.
