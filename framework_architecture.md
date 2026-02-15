@@ -63,7 +63,7 @@ These are specialized modes of operation triggered by the Orchestrator.
 #### **DevOps**
 - **Input**: Tested Code.
 - **Output**: Dockerfiles, K8s manifests, CI/CD pipelines.
-- **Behavior**: Prepares the artifact for cloud deployment.
+- **Behavior**: Manages the 3-tier pipeline (PR Validation -> QA -> Prod).
 
 ## 3. Data Flow & Communication
 

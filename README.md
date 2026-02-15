@@ -6,7 +6,7 @@
 
 ## ✨ Overview
 
-A premium, McKinsey-style web application showcasing **IBM Consulting** capabilities. This project demonstrates the full SDLC — from ideation to production deployment on **IBM Cloud** — using an AI-automated development workflow.
+A premium, McKinsey-style web application showcasing **IBM Consulting** capabilities. This project demonstrates the full SDLC — from ideation to production deployment on **IBM Cloud** — using an AI-automated development workflow with a 3-tier CI/CD pipeline (Dev -> QA -> Prod).
 
 | Feature | Stack |
 |---------|-------|
@@ -78,7 +78,12 @@ terraform output frontend_url
 terraform output backend_url
 ```
 
-CI/CD is configured via `.github/workflows/deploy.yml` — pushing to `main` will automatically build, test, and deploy.
+CI/CD is configured via a 3-tier pipeline:
+- **PR Validation**: Runs tests on Pull Requests.
+- **QA Deployment**: Pushing to `develop` deploys to QA apps.
+- **Prod Deployment**: Pushing to `master` deploys to Production apps.
+
+See [docs/cicd-guide.md](./docs/cicd-guide.md) for full details.
 
 **Required GitHub Secret**: `IBM_CLOUD_API_KEY`
 
