@@ -3,44 +3,55 @@ const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
+const contentCache = require('./services/cache');
+
 const app = express();
 const PORT = process.env.PORT || 4000;
+const CACHE_REFRESH_INTERVAL = process.env.CACHE_REFRESH_MS || 6 * 60 * 60 * 1000; // 6 hours
 
-// Middleware
+// ─── Middleware ─────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
-
-// Load data
-const insights = require('./data/insights.json');
-const caseStudies = require('./data/case-studies.json');
 
 // ─── Health Check ───────────────────────────────────────────
 app.get('/', (req, res) => {
   res.json({
     status: 'ok',
     service: 'ibm-consulting-api',
-    version: '1.0.0',
+    version: '2.0.0',
     timestamp: new Date().toISOString(),
+  });
+});
+
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    uptime: process.uptime(),
+    cache: contentCache.getStatus(),
   });
 });
 
 // ─── Insights API ───────────────────────────────────────────
 app.get('/api/insights', (req, res) => {
   const { category, featured } = req.query;
-  let result = [...insights];
+  const { data, source } = contentCache.getInsights();
+  let result = [...data];
 
   if (category) {
-    result = result.filter(i => i.category.toLowerCase() === category.toLowerCase());
+    result = result.filter(i =>
+      (i.category || '').toLowerCase() === category.toLowerCase()
+    );
   }
   if (featured === 'true') {
     result = result.filter(i => i.featured);
   }
 
-  res.json({ data: result, total: result.length });
+  res.json({ data: result, total: result.length, source });
 });
 
 app.get('/api/insights/:slug', (req, res) => {
-  const insight = insights.find(i => i.slug === req.params.slug);
+  const { data } = contentCache.getInsights();
+  const insight = data.find(i => i.slug === req.params.slug);
   if (!insight) return res.status(404).json({ error: 'Insight not found' });
   res.json({ data: insight });
 });
@@ -48,63 +59,29 @@ app.get('/api/insights/:slug', (req, res) => {
 // ─── Case Studies API ───────────────────────────────────────
 app.get('/api/case-studies', (req, res) => {
   const { industry } = req.query;
-  let result = [...caseStudies];
+  const { data, source } = contentCache.getCaseStudies();
+  let result = [...data];
 
   if (industry) {
-    result = result.filter(c => c.industry.toLowerCase().includes(industry.toLowerCase()));
+    result = result.filter(c =>
+      (c.industry || '').toLowerCase().includes(industry.toLowerCase())
+    );
   }
 
-  res.json({ data: result, total: result.length });
+  res.json({ data: result, total: result.length, source });
 });
 
 app.get('/api/case-studies/:slug', (req, res) => {
-  const study = caseStudies.find(c => c.slug === req.params.slug);
+  const { data } = contentCache.getCaseStudies();
+  const study = data.find(c => c.slug === req.params.slug);
   if (!study) return res.status(404).json({ error: 'Case study not found' });
   res.json({ data: study });
 });
 
-// ─── Services (static) ─────────────────────────────────────
+// ─── Services API ───────────────────────────────────────────
 app.get('/api/services', (req, res) => {
-  res.json({
-    data: [
-      {
-        id: 'strategy',
-        title: 'Strategy Consulting',
-        description: 'Transform your business model with data-driven strategy and AI-powered decision frameworks.',
-        icon: 'strategy',
-      },
-      {
-        id: 'ai',
-        title: 'AI & Automation',
-        description: 'Deploy enterprise AI at scale with IBM watsonx and intelligent automation platforms.',
-        icon: 'ai',
-      },
-      {
-        id: 'cloud',
-        title: 'Cloud Transformation',
-        description: 'Modernize infrastructure with hybrid cloud architectures on Red Hat OpenShift and IBM Cloud.',
-        icon: 'cloud',
-      },
-      {
-        id: 'security',
-        title: 'Cybersecurity Services',
-        description: 'Protect your enterprise with zero-trust architecture and quantum-safe security strategies.',
-        icon: 'security',
-      },
-      {
-        id: 'data',
-        title: 'Data & Analytics',
-        description: 'Unlock the value of your data with modern data platforms, governance, and real-time analytics.',
-        icon: 'data',
-      },
-      {
-        id: 'sustainability',
-        title: 'Sustainability',
-        description: 'Accelerate your ESG goals with IBM Envizi and end-to-end sustainability transformation.',
-        icon: 'sustainability',
-      },
-    ],
-  });
+  const { data, source } = contentCache.getServices();
+  res.json({ data, source });
 });
 
 // ─── Contact form (mock) ────────────────────────────────────
@@ -115,12 +92,41 @@ app.post('/api/contact', (req, res) => {
     return res.status(400).json({ error: 'Name, email, and message are required.' });
   }
 
-  // In production, this would send an email or write to a DB.
   console.log(`[CONTACT] From: ${name} <${email}> | Company: ${company || 'N/A'}`);
   res.json({ success: true, message: 'Thank you for your inquiry. We will be in touch shortly.' });
 });
 
-// ─── Start ──────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`🚀 IBM Consulting API running on port ${PORT}`);
+// ─── Error handling ─────────────────────────────────────────
+app.use((err, req, res, next) => {
+  console.error(`[ERROR] ${err.message}`);
+  res.status(500).json({ error: 'Internal server error' });
 });
+
+// ─── Start server & warm cache ──────────────────────────────
+async function start() {
+  // Warm cache on startup (non-blocking)
+  contentCache.warmCache().catch(err => {
+    console.error(`[STARTUP] Cache warming failed: ${err.message}`);
+  });
+
+  // Schedule periodic cache refresh
+  setInterval(() => {
+    console.log('[SCHEDULER] Refreshing content cache...');
+    contentCache.warmCache().catch(err => {
+      console.error(`[SCHEDULER] Cache refresh failed: ${err.message}`);
+    });
+  }, CACHE_REFRESH_INTERVAL);
+
+  app.listen(PORT, () => {
+    console.log(`🚀 IBM Consulting API v2.0 running on port ${PORT}`);
+    console.log(`📦 Cache refresh interval: ${CACHE_REFRESH_INTERVAL / 1000 / 60} minutes`);
+  });
+}
+
+// Export app for testing (supertest)
+module.exports = app;
+
+// Start if run directly
+if (require.main === module) {
+  start();
+}

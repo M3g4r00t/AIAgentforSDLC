@@ -1,120 +1,196 @@
+'use client';
+
 import Link from 'next/link';
-import { ArrowRight, ArrowUpRight, Sparkles, Globe, Shield, Cpu } from 'lucide-react';
-import { AnimatedCounter } from '@/components/AnimatedCounter';
+import { ArrowRight, BarChart3, Brain, Cloud, Shield, Globe, Zap } from 'lucide-react';
+import { useEffect, useState, useRef } from 'react';
+
+// ─── Animated Counter Component (inline for homepage) ───────
+function AnimatedCounter({ end, suffix = '', duration = 2000 }: { end: number; suffix?: string; duration?: number }) {
+    const [count, setCount] = useState(0);
+    const [started, setStarted] = useState(false);
+    const ref = useRef<HTMLSpanElement>(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => { if (entry.isIntersecting && !started) setStarted(true); },
+            { threshold: 0.3 }
+        );
+        if (ref.current) observer.observe(ref.current);
+        return () => observer.disconnect();
+    }, [started]);
+
+    useEffect(() => {
+        if (!started) return;
+        let frame: number;
+        const start = performance.now();
+        const animate = (now: number) => {
+            const progress = Math.min((now - start) / duration, 1);
+            const ease = 1 - Math.pow(1 - progress, 3);
+            setCount(Math.floor(ease * end));
+            if (progress < 1) frame = requestAnimationFrame(animate);
+        };
+        frame = requestAnimationFrame(animate);
+        return () => cancelAnimationFrame(frame);
+    }, [started, end, duration]);
+
+    return <span ref={ref}>{count}{suffix}</span>;
+}
+
+// ─── Stats Data ─────────────────────────────────────────────
+const stats = [
+    { value: 160000, suffix: '+', label: 'Consultants Worldwide' },
+    { value: 170, suffix: '+', label: 'Countries Served' },
+    { value: 95, suffix: '%', label: 'Fortune 500 Clients' },
+    { value: 40, suffix: '+', label: 'Years of Innovation' },
+];
+
+const capabilities = [
+    { icon: Brain, title: 'AI & Automation', desc: 'Deploy enterprise AI at scale with IBM watsonx.', color: 'from-blue-500 to-purple-600' },
+    { icon: Cloud, title: 'Cloud Transformation', desc: 'Modernize with hybrid cloud on Red Hat OpenShift.', color: 'from-cyan-500 to-blue-600' },
+    { icon: Shield, title: 'Cybersecurity', desc: 'Zero-trust architecture and quantum-safe security.', color: 'from-emerald-500 to-teal-600' },
+    { icon: BarChart3, title: 'Data & Analytics', desc: 'Unlock value with modern data platforms.', color: 'from-amber-500 to-orange-600' },
+];
 
 export default function HomePage() {
+    const [insights, setInsights] = useState<any[]>([]);
+
+    useEffect(() => {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        fetch(`${apiUrl}/api/insights?featured=true`)
+            .then(r => r.json())
+            .then(d => setInsights(d.data?.slice(0, 3) || []))
+            .catch(() => { });
+    }, []);
+
     return (
-        <>
-            {/* ─── Hero Section ──────────────────────────────── */}
-            <section className="relative hero-gradient min-h-screen flex items-center overflow-hidden">
-                {/* Decorative Grid */}
-                <div className="absolute inset-0 opacity-10">
-                    <div className="absolute inset-0" style={{
-                        backgroundImage: 'linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)',
-                        backgroundSize: '64px 64px',
-                    }} />
-                </div>
+        <main className="min-h-screen">
+            {/* ─── Hero Section ────────────────────────────── */}
+            <section className="relative min-h-[85vh] flex items-center overflow-hidden">
+                <div className="absolute inset-0 animated-gradient opacity-30" />
+                <div className="absolute top-20 right-20 w-96 h-96 bg-ibm-blue/20 rounded-full blur-3xl animate-float" />
+                <div className="absolute bottom-20 left-20 w-72 h-72 bg-ibm-purple/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '3s' }} />
 
-                {/* Floating Orbs */}
-                <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-ibm-blue-40/20 rounded-full blur-3xl animate-pulse-glow" />
-                <div className="absolute bottom-1/4 left-1/6 w-64 h-64 bg-ibm-teal-40/15 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: '1.5s' }} />
-
-                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20">
+                <div className="relative z-10 container mx-auto px-6 lg:px-12">
                     <div className="max-w-4xl">
-                        <div className="section-animate">
-                            <span className="tag mb-6 inline-block">IBM Consulting</span>
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm mb-8">
+                            <Zap className="w-4 h-4 text-ibm-blue" />
+                            <span className="text-sm text-gray-300">Powered by IBM watsonx</span>
                         </div>
 
-                        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.1] tracking-tight mb-8 section-animate section-animate-delay-1">
-                            Transforming Enterprises
-                            <br />
-                            <span className="bg-gradient-to-r from-ibm-blue-30 to-ibm-teal-40 bg-clip-text text-transparent">
-                                with AI & Cloud
+                        <h1 className="text-5xl lg:text-7xl font-bold leading-tight mb-6">
+                            Orchestrate{' '}
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-ibm-blue to-ibm-purple">
+                                AI at Scale
                             </span>
                         </h1>
 
-                        <p className="text-xl text-ibm-blue-20/80 max-w-2xl mb-12 leading-relaxed section-animate section-animate-delay-2">
-                            We partner with the world&apos;s leading organizations to reimagine their businesses through
-                            strategy, technology, and deep industry expertise.
+                        <p className="text-xl lg:text-2xl text-gray-300 max-w-2xl mb-10 leading-relaxed">
+                            IBM Consulting® is where trusted expertise meets powerful technology.
+                            We advise, design, build, and operate business innovation that matters.
                         </p>
 
-                        <div className="flex flex-wrap gap-4 section-animate section-animate-delay-3">
-                            <Link href="/services" className="btn-primary text-base">
-                                Explore Our Services <ArrowRight size={18} />
+                        <div className="flex flex-wrap gap-4">
+                            <Link href="/services" className="group inline-flex items-center gap-2 px-8 py-4 bg-ibm-blue hover:bg-ibm-blue/90 rounded-lg font-semibold transition-all">
+                                Explore Services
+                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </Link>
-                            <Link href="/case-studies" className="btn-secondary text-base">
-                                View Case Studies
+                            <Link href="/contact" className="inline-flex items-center gap-2 px-8 py-4 border border-white/20 hover:bg-white/5 rounded-lg font-semibold transition-all">
+                                Contact Us
                             </Link>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* ─── Stats Bar ──────────────────────────────── */}
-            <section className="relative -mt-20 z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="glass-card p-8 md:p-12">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                        <AnimatedCounter end={160} suffix="K+" label="Consultants Worldwide" />
-                        <AnimatedCounter end={170} suffix="+" label="Countries Served" />
-                        <AnimatedCounter end={95} suffix="%" label="Fortune 500 Clients" />
-                        <AnimatedCounter end={4} prefix="$" suffix=".4T" label="AI Value Potential" />
-                    </div>
+            {/* ─── Stats Bar ───────────────────────────────── */}
+            <section className="border-y border-white/10 bg-black/30 backdrop-blur-sm">
+                <div className="container mx-auto px-6 py-12 grid grid-cols-2 lg:grid-cols-4 gap-8">
+                    {stats.map((stat, i) => (
+                        <div key={i} className="text-center">
+                            <div className="text-4xl lg:text-5xl font-bold text-ibm-blue mb-2">
+                                <AnimatedCounter end={stat.value} suffix={stat.suffix} />
+                            </div>
+                            <div className="text-sm text-gray-400 uppercase tracking-wider">{stat.label}</div>
+                        </div>
+                    ))}
                 </div>
             </section>
 
-            {/* ─── Capabilities Preview ─────────────────────── */}
-            <section className="py-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="mb-16">
-                    <div className="accent-line mb-6" />
-                    <h2 className="text-4xl font-bold text-ibm-gray-10 mb-4">
-                        What We Do
-                    </h2>
-                    <p className="text-ibm-gray-50 text-lg max-w-2xl">
-                        End-to-end consulting capabilities powered by technology and human expertise.
+            {/* ─── Capabilities Preview ────────────────────── */}
+            <section className="container mx-auto px-6 lg:px-12 py-24">
+                <div className="text-center mb-16">
+                    <h2 className="text-3xl lg:text-5xl font-bold mb-4">Our Capabilities</h2>
+                    <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                        End-to-end consulting powered by IBM&apos;s technology leadership
                     </p>
                 </div>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {[
-                        { icon: <Sparkles size={24} />, title: 'Strategy', desc: 'Data-driven business transformation and operating model design.' },
-                        { icon: <Cpu size={24} />, title: 'AI & Automation', desc: 'Enterprise AI deployment with IBM watsonx at scale.' },
-                        { icon: <Globe size={24} />, title: 'Cloud', desc: 'Hybrid cloud migration and modernization on Red Hat OpenShift.' },
-                        { icon: <Shield size={24} />, title: 'Security', desc: 'Zero-trust architecture and threat intelligence services.' },
-                    ].map((cap, i) => (
-                        <div key={cap.title} className={`glass-card p-8 group cursor-pointer section-animate section-animate-delay-${i + 1}`}>
-                            <div className="w-12 h-12 rounded-lg bg-ibm-blue-60/10 flex items-center justify-center text-ibm-blue-40 mb-6 group-hover:bg-ibm-blue-60/20 transition-colors">
-                                {cap.icon}
+                    {capabilities.map((cap, i) => (
+                        <div key={i} className="glass-card p-6 rounded-xl hover:scale-105 transition-transform duration-300 group">
+                            <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${cap.color} flex items-center justify-center mb-4`}>
+                                <cap.icon className="w-6 h-6 text-white" />
                             </div>
-                            <h3 className="text-xl font-semibold text-ibm-gray-10 mb-3">{cap.title}</h3>
-                            <p className="text-ibm-gray-50 text-sm leading-relaxed">{cap.desc}</p>
-                            <div className="mt-6 flex items-center gap-1 text-ibm-blue-40 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                Learn more <ArrowUpRight size={14} />
-                            </div>
+                            <h3 className="text-xl font-semibold mb-2">{cap.title}</h3>
+                            <p className="text-gray-400 text-sm">{cap.desc}</p>
                         </div>
                     ))}
                 </div>
 
-                <div className="mt-12 text-center">
-                    <Link href="/services" className="btn-secondary">
-                        View All Services <ArrowRight size={16} />
+                <div className="text-center mt-12">
+                    <Link href="/services" className="group inline-flex items-center gap-2 text-ibm-blue hover:text-ibm-blue/80 font-semibold">
+                        View All Services
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Link>
                 </div>
             </section>
 
-            {/* ─── CTA Section ──────────────────────────── */}
-            <section className="py-32 border-t border-ibm-gray-80">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h2 className="text-4xl md:text-5xl font-bold text-ibm-gray-10 mb-6">
-                        Ready to transform?
-                    </h2>
-                    <p className="text-ibm-gray-50 text-lg max-w-xl mx-auto mb-10">
-                        Let&apos;s build the future of your enterprise together.
-                    </p>
-                    <Link href="/contact" className="btn-primary text-lg px-8 py-4">
-                        Start a Conversation <ArrowRight size={20} />
-                    </Link>
+            {/* ─── Featured Insights ───────────────────────── */}
+            {insights.length > 0 && (
+                <section className="container mx-auto px-6 lg:px-12 py-24 border-t border-white/10">
+                    <div className="flex justify-between items-end mb-12">
+                        <div>
+                            <h2 className="text-3xl lg:text-4xl font-bold mb-2">Latest Insights</h2>
+                            <p className="text-gray-400">Thought leadership from IBM experts</p>
+                        </div>
+                        <Link href="/insights" className="text-ibm-blue hover:text-ibm-blue/80 font-semibold flex items-center gap-1">
+                            All Insights <ArrowRight className="w-4 h-4" />
+                        </Link>
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-6">
+                        {insights.map((insight: any, i: number) => (
+                            <article key={i} className="glass-card rounded-xl overflow-hidden group hover:scale-[1.02] transition-transform">
+                                <div className={`h-2 bg-gradient-to-r ${i === 0 ? 'from-ibm-blue to-ibm-purple' : i === 1 ? 'from-cyan-500 to-blue-600' : 'from-emerald-500 to-teal-600'}`} />
+                                <div className="p-6">
+                                    <span className="text-xs text-ibm-blue uppercase tracking-wider">{insight.category}</span>
+                                    <h3 className="text-lg font-semibold mt-2 mb-3 line-clamp-2">{insight.title}</h3>
+                                    <p className="text-gray-400 text-sm line-clamp-2">{insight.summary}</p>
+                                    <div className="mt-4 text-xs text-gray-500">{insight.author} · {insight.readTime}</div>
+                                </div>
+                            </article>
+                        ))}
+                    </div>
+                </section>
+            )}
+
+            {/* ─── CTA Section ─────────────────────────────── */}
+            <section className="container mx-auto px-6 lg:px-12 py-24">
+                <div className="glass-card rounded-2xl p-12 lg:p-16 text-center relative overflow-hidden">
+                    <div className="absolute inset-0 animated-gradient opacity-10" />
+                    <div className="relative z-10">
+                        <Globe className="w-12 h-12 text-ibm-blue mx-auto mb-6" />
+                        <h2 className="text-3xl lg:text-4xl font-bold mb-4">Ready to Transform Your Business?</h2>
+                        <p className="text-gray-400 text-lg max-w-xl mx-auto mb-8">
+                            Let&apos;s discuss how IBM Consulting can help you unlock new opportunities.
+                        </p>
+                        <Link href="/contact" className="inline-flex items-center gap-2 px-8 py-4 bg-ibm-blue hover:bg-ibm-blue/90 rounded-lg font-semibold transition-all">
+                            Start a Conversation
+                            <ArrowRight className="w-5 h-5" />
+                        </Link>
+                    </div>
                 </div>
             </section>
-        </>
+        </main>
     );
 }
