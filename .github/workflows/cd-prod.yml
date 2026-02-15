@@ -1,0 +1,67 @@
+name: CD - Production Environment
+
+on:
+  push:
+    branches: [ "master" ]
+
+env:
+  IBM_CLOUD_REGION: us-south
+  CE_PROJECT: ibm-consulting-project
+  REGISTRY: us.icr.io
+  NAMESPACE: ibm-consulting
+
+jobs:
+  build-and-deploy-prod:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # ─── Docker Build & Push ──────────────────────
+      - name: Login to IBM Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: iamapikey
+          password: ${{ secrets.IBM_CLOUD_API_KEY }}
+
+      - name: Build & Push Backend (Prod)
+        uses: docker/build-push-action@v5
+        with:
+          context: src/backend
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ibm-consulting-api:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ibm-consulting-api:latest
+
+      - name: Build & Push Frontend (Prod)
+        uses: docker/build-push-action@v5
+        with:
+          context: src/frontend
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ibm-consulting-web:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ibm-consulting-web:latest
+
+      # ─── Deploy to Code Engine (Prod Apps) ────────
+      - name: Install IBM Cloud CLI
+        run: |
+          curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
+          ibmcloud plugin install code-engine -f
+
+      - name: Authenticate IBM Cloud
+        run: |
+          ibmcloud login --apikey ${{ secrets.IBM_CLOUD_API_KEY }} -r ${{ env.IBM_CLOUD_REGION }}
+          ibmcloud ce project select --name ${{ env.CE_PROJECT }}
+
+      - name: Deploy Backend Prod
+        run: |
+          ibmcloud ce app update \
+            --name ibm-consulting-api \
+            --image ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ibm-consulting-api:${{ github.sha }}
+
+      - name: Deploy Frontend Prod
+        run: |
+          ibmcloud ce app update \
+            --name ibm-consulting-web \
+            --image ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ibm-consulting-web:${{ github.sha }} \
+            --env NEXT_PUBLIC_API_URL=https://ibm-consulting-api.26dwjxqdfb88.us-south.codeengine.appdomain.cloud
