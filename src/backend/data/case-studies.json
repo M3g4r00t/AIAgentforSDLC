@@ -1,0 +1,98 @@
+[
+    {
+        "id": "case-001",
+        "title": "Global Bank Transforms Customer Experience with AI",
+        "slug": "global-bank-ai-transformation",
+        "industry": "Financial Services",
+        "challenge": "A top-10 global bank faced declining customer satisfaction scores and increasing operational costs in its retail banking division.",
+        "solution": "IBM Consulting deployed a conversational AI platform powered by watsonx, integrated with the bank's core banking system through hybrid cloud APIs.",
+        "results": [
+            {
+                "metric": "40%",
+                "label": "Reduction in call center volume"
+            },
+            {
+                "metric": "$120M",
+                "label": "Annual cost savings"
+            },
+            {
+                "metric": "35pts",
+                "label": "NPS improvement"
+            },
+            {
+                "metric": "3.8M",
+                "label": "AI-handled interactions/month"
+            }
+        ],
+        "technologies": [
+            "IBM watsonx",
+            "Red Hat OpenShift",
+            "IBM Cloud Pak for Data"
+        ],
+        "imageTag": "finance"
+    },
+    {
+        "id": "case-002",
+        "title": "Healthcare Network Achieves Zero-Downtime Migration",
+        "slug": "healthcare-zero-downtime-migration",
+        "industry": "Healthcare",
+        "challenge": "A network of 200+ hospitals needed to migrate from legacy on-premises systems to a hybrid cloud infrastructure without disrupting critical patient care systems.",
+        "solution": "IBM Consulting orchestrated a phased migration leveraging Red Hat OpenShift and IBM Cloud, ensuring HIPAA compliance and real-time data synchronization.",
+        "results": [
+            {
+                "metric": "0",
+                "label": "Minutes of downtime"
+            },
+            {
+                "metric": "60%",
+                "label": "Infrastructure cost reduction"
+            },
+            {
+                "metric": "200+",
+                "label": "Hospitals migrated"
+            },
+            {
+                "metric": "99.99%",
+                "label": "Uptime SLA achieved"
+            }
+        ],
+        "technologies": [
+            "Red Hat OpenShift",
+            "IBM Cloud",
+            "IBM Instana"
+        ],
+        "imageTag": "healthcare"
+    },
+    {
+        "id": "case-003",
+        "title": "Automotive Giant Builds AI-Powered Supply Chain",
+        "slug": "automotive-ai-supply-chain",
+        "industry": "Automotive & Manufacturing",
+        "challenge": "A Fortune 100 automaker suffered $2B in losses from supply chain disruptions and needed predictive visibility across 12,000+ suppliers.",
+        "solution": "IBM Consulting built an AI-powered supply chain control tower using IBM Sterling and watsonx, providing real-time risk scoring and automated mitigation workflows.",
+        "results": [
+            {
+                "metric": "85%",
+                "label": "Disruption prediction accuracy"
+            },
+            {
+                "metric": "$800M",
+                "label": "Risk exposure mitigated"
+            },
+            {
+                "metric": "12K+",
+                "label": "Suppliers monitored in real-time"
+            },
+            {
+                "metric": "50%",
+                "label": "Faster response to disruptions"
+            }
+        ],
+        "technologies": [
+            "IBM Sterling",
+            "IBM watsonx",
+            "IBM Cloud Pak for Business Automation"
+        ],
+        "imageTag": "manufacturing"
+    }
+]

@@ -1,0 +1,67 @@
+[
+    {
+        "id": "insight-001",
+        "title": "The CEO's Guide to Generative AI",
+        "slug": "ceo-guide-generative-ai",
+        "category": "Artificial Intelligence",
+        "date": "2026-01-15",
+        "readTime": "12 min read",
+        "summary": "Generative AI is redefining how enterprises create value. Leaders who act now will capture an outsized share of the estimated $4.4 trillion in annual productivity gains.",
+        "author": "IBM Institute for Business Value",
+        "imageTag": "ai",
+        "featured": true,
+        "content": "The generative AI revolution is not coming — it's here. Our latest research across 3,000 C-suite executives reveals that organizations already scaling AI are seeing 2.5x higher revenue growth compared to their peers. This article explores the strategic imperatives for CEOs navigating the new landscape."
+    },
+    {
+        "id": "insight-002",
+        "title": "Hybrid Cloud: The Architecture of Resilience",
+        "slug": "hybrid-cloud-architecture-resilience",
+        "category": "Cloud & Infrastructure",
+        "date": "2026-01-08",
+        "readTime": "8 min read",
+        "summary": "Organizations that embrace hybrid cloud architectures achieve 2.5x the value of those relying on a single platform or single-vendor approach.",
+        "author": "IBM Cloud Advisory",
+        "imageTag": "cloud",
+        "featured": true,
+        "content": "In an era of unprecedented digital complexity, hybrid cloud has emerged as the architecture of choice for 77% of enterprises. Our analysis shows that the key differentiator is not the technology itself, but the operating model that surrounds it."
+    },
+    {
+        "id": "insight-003",
+        "title": "Cybersecurity in the Age of Quantum Computing",
+        "slug": "cybersecurity-quantum-computing",
+        "category": "Security",
+        "date": "2025-12-20",
+        "readTime": "10 min read",
+        "summary": "With quantum computing on the horizon, enterprises must begin their transition to quantum-safe cryptography today.",
+        "author": "IBM Security Intelligence",
+        "imageTag": "security",
+        "featured": false,
+        "content": "Quantum computing promises to break the cryptographic foundations of modern cybersecurity within the next decade. IBM Consulting is helping clients prepare for this transition through a phased approach to quantum-safe strategies."
+    },
+    {
+        "id": "insight-004",
+        "title": "Sustainability Transformation: From Ambition to Impact",
+        "slug": "sustainability-transformation",
+        "category": "Sustainability",
+        "date": "2025-12-10",
+        "readTime": "7 min read",
+        "summary": "Leading companies are turning sustainability commitments into measurable business outcomes through data-driven ESG platforms.",
+        "author": "IBM Sustainability Practice",
+        "imageTag": "sustainability",
+        "featured": false,
+        "content": "Our analysis of 500 sustainability leaders reveals that companies embedding ESG metrics into core business decisions are achieving both environmental targets and superior financial performance."
+    },
+    {
+        "id": "insight-005",
+        "title": "The Talent Revolution: Reskilling for the AI Economy",
+        "slug": "talent-revolution-reskilling",
+        "category": "Talent & Organization",
+        "date": "2025-11-28",
+        "readTime": "9 min read",
+        "summary": "By 2028, 40% of the global workforce will need reskilling. Organizations that invest now will secure a lasting competitive advantage.",
+        "author": "IBM Talent Transformation",
+        "imageTag": "talent",
+        "featured": false,
+        "content": "The intersection of AI, automation, and demographic shifts is creating the largest reskilling challenge in modern history. IBM Consulting's workforce transformation framework helps organizations build the capabilities they need for the future."
+    }
+]
