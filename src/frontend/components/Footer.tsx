@@ -9,6 +9,7 @@ const footerLinks = [
             { label: 'AI & Automation', href: '/services' },
             { label: 'Cloud Transformation', href: '/services' },
             { label: 'Cybersecurity', href: '/services' },
+            { label: 'Data & Analytics', href: '/services' },
         ],
     },
     {

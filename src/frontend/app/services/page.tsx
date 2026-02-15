@@ -10,6 +10,7 @@ interface Service {
     description: string;
     icon: string;
     url?: string;
+    image?: string;
 }
 
 const iconMap: Record<string, any> = {
@@ -85,40 +86,53 @@ export default function ServicesPage() {
                             return (
                                 <div
                                     key={service.id}
-                                    className="glass-card rounded-xl p-8 hover:scale-[1.03] transition-transform group"
+                                    className="glass-card rounded-xl overflow-hidden hover:scale-[1.03] transition-transform group flex flex-col h-full"
                                 >
-                                    <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-6`}>
-                                        <Icon className="w-7 h-7 text-white" />
+                                    <div className="h-48 relative overflow-hidden">
+                                        {service.image ? (
+                                            <img
+                                                src={service.image}
+                                                alt={service.title}
+                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                            />
+                                        ) : (
+                                            <div className={`w-full h-full bg-gradient-to-br ${gradient}`} />
+                                        )}
+                                        <div className="absolute top-4 left-4 w-12 h-12 rounded-lg bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/10">
+                                            <Icon className="w-6 h-6 text-white" />
+                                        </div>
                                     </div>
 
-                                    <h3 className="text-2xl font-semibold mb-3 group-hover:text-ibm-blue transition-colors">
-                                        {service.title}
-                                    </h3>
+                                    <div className="p-8 flex flex-col flex-grow">
+                                        <h3 className="text-2xl font-semibold mb-3 group-hover:text-ibm-blue transition-colors">
+                                            {service.title}
+                                        </h3>
 
-                                    <p className="text-gray-400 mb-4 line-clamp-3">
-                                        {service.description}
-                                    </p>
+                                        <p className="text-gray-400 mb-6 line-clamp-3">
+                                            {service.description}
+                                        </p>
 
-                                    {tags.length > 0 && (
-                                        <div className="flex flex-wrap gap-2 mb-4">
-                                            {tags.map((tag, j) => (
-                                                <span key={j} className="text-xs bg-white/5 text-gray-300 px-3 py-1 rounded-full border border-white/10">
-                                                    {tag}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    )}
+                                        {tags.length > 0 && (
+                                            <div className="flex flex-wrap gap-2 mb-6 mt-auto">
+                                                {tags.map((tag, j) => (
+                                                    <span key={j} className="text-xs bg-white/5 text-gray-300 px-3 py-1 rounded-full border border-white/10">
+                                                        {tag}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
 
-                                    {service.url && (
-                                        <a
-                                            href={service.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-ibm-blue text-sm font-medium flex items-center gap-1 mt-2"
-                                        >
-                                            Learn More <ArrowRight className="w-3 h-3" />
-                                        </a>
-                                    )}
+                                        {service.url && (
+                                            <a
+                                                href={service.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-ibm-blue text-sm font-medium flex items-center gap-1 mt-auto pt-4 border-t border-white/5"
+                                            >
+                                                Learn More <ArrowRight className="w-3 h-3" />
+                                            </a>
+                                        )}
+                                    </div>
                                 </div>
                             );
                         })}

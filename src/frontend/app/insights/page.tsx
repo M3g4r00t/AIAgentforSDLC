@@ -13,6 +13,7 @@ interface Insight {
     readTime: string;
     featured: boolean;
     url?: string;
+    image?: string;
 }
 
 const gradients = [
@@ -83,19 +84,32 @@ export default function InsightsPage() {
                                             href={article.url || '#'}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="glass-card rounded-xl overflow-hidden group hover:scale-[1.02] transition-transform"
+                                            className="glass-card rounded-xl overflow-hidden group hover:scale-[1.02] transition-transform flex flex-col h-full"
                                         >
-                                            <div className={`h-48 bg-gradient-to-br ${gradients[i % gradients.length]} flex items-end p-6`}>
-                                                <span className="text-xs uppercase tracking-wider bg-black/30 px-3 py-1 rounded-full backdrop-blur-sm">
-                                                    {article.category}
-                                                </span>
+                                            <div className={`h-48 relative overflow-hidden ${!article.image ? `bg-gradient-to-br ${gradients[i % gradients.length]}` : ''}`}>
+                                                {article.image ? (
+                                                    <img
+                                                        src={article.image}
+                                                        alt={article.title}
+                                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                        onError={(e) => {
+                                                            e.currentTarget.style.display = 'none';
+                                                            e.currentTarget.parentElement?.classList.add('bg-gradient-to-br', ...gradients[i % gradients.length].split(' '));
+                                                        }}
+                                                    />
+                                                ) : null}
+                                                <div className="absolute top-4 left-4">
+                                                    <span className="text-xs uppercase tracking-wider bg-black/60 text-white px-3 py-1 rounded-full backdrop-blur-md border border-white/10">
+                                                        {article.category}
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <div className="p-6">
+                                            <div className="p-6 flex flex-col flex-grow">
                                                 <h3 className="text-xl font-semibold mb-3 group-hover:text-ibm-blue transition-colors line-clamp-2">
                                                     {article.title}
                                                 </h3>
-                                                <p className="text-gray-400 text-sm mb-4 line-clamp-2">{article.summary}</p>
-                                                <div className="flex items-center gap-4 text-xs text-gray-500">
+                                                <p className="text-gray-400 text-sm mb-4 line-clamp-3">{article.summary}</p>
+                                                <div className="mt-auto pt-4 flex items-center gap-4 text-xs text-gray-500 border-t border-white/5">
                                                     <span className="flex items-center gap-1"><User className="w-3 h-3" />{article.author}</span>
                                                     <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{article.readTime}</span>
                                                 </div>
@@ -111,27 +125,41 @@ export default function InsightsPage() {
                             <section>
                                 <h2 className="text-2xl font-bold mb-8">Latest Articles</h2>
                                 <div className="space-y-4">
-                                    {latest.map((article) => (
+                                    {latest.map((article, i) => (
                                         <a
                                             key={article.slug}
                                             href={article.url || '#'}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="glass-card rounded-xl p-6 flex items-center gap-6 hover:scale-[1.01] transition-transform group"
+                                            className="glass-card rounded-xl p-4 sm:p-6 flex items-start sm:items-center gap-4 sm:gap-6 hover:scale-[1.01] transition-transform group"
                                         >
-                                            <div className="hidden md:block w-2 h-16 rounded-full bg-gradient-to-b from-ibm-blue to-ibm-purple flex-shrink-0" />
-                                            <div className="flex-grow">
-                                                <span className="text-xs text-ibm-blue uppercase tracking-wider">{article.category}</span>
-                                                <h3 className="text-lg font-semibold mt-1 group-hover:text-ibm-blue transition-colors line-clamp-1">
+                                            <div className="hidden sm:block w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 relative bg-gray-800">
+                                                {article.image ? (
+                                                    <img
+                                                        src={article.image}
+                                                        alt=""
+                                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                                        onError={(e) => {
+                                                            e.currentTarget.style.display = 'none';
+                                                            e.currentTarget.parentElement?.classList.add('bg-gradient-to-b', 'from-ibm-blue', 'to-ibm-purple');
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full bg-gradient-to-b from-ibm-blue to-ibm-purple" />
+                                                )}
+                                            </div>
+                                            <div className="flex-grow min-w-0">
+                                                <span className="text-xs text-ibm-blue uppercase tracking-wider block mb-1">{article.category}</span>
+                                                <h3 className="text-lg font-semibold group-hover:text-ibm-blue transition-colors line-clamp-2 mb-2">
                                                     {article.title}
                                                 </h3>
-                                                <p className="text-gray-400 text-sm mt-1 line-clamp-1">{article.summary}</p>
+                                                <p className="text-gray-400 text-sm line-clamp-2 mb-2">{article.summary}</p>
+                                                <div className="flex items-center gap-4 text-xs text-gray-500">
+                                                    <span className="truncate max-w-[100px]">{article.author}</span>
+                                                    <span>{article.readTime}</span>
+                                                </div>
                                             </div>
-                                            <div className="hidden lg:flex items-center gap-4 text-xs text-gray-500 flex-shrink-0">
-                                                <span>{article.author}</span>
-                                                <span>{article.readTime}</span>
-                                            </div>
-                                            <ArrowRight className="w-5 h-5 text-gray-500 group-hover:text-ibm-blue transition-colors flex-shrink-0" />
+                                            <ArrowRight className="hidden sm:block w-5 h-5 text-gray-500 group-hover:text-ibm-blue transition-colors flex-shrink-0" />
                                         </a>
                                     ))}
                                 </div>

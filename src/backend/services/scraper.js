@@ -34,6 +34,58 @@ function slugify(text) {
         .slice(0, 80);
 }
 
+// ─── Image Fallbacks (Unsplash Source) ──────────────────────
+const FALLBACK_IMAGES = {
+    ai: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=800&q=80',
+    cloud: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80',
+    cybersecurity: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80',
+    data: 'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?auto=format&fit=crop&w=800&q=80',
+    automation: 'https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?auto=format&fit=crop&w=800&q=80',
+    quantum: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=800&q=80',
+    consulting: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80',
+    sustainability: 'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=800&q=80',
+    finance: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=800&q=80',
+    supply: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80',
+    talent: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=800&q=80',
+    experience: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80',
+    operations: 'https://images.unsplash.com/photo-1664575602276-acd073f104c1?auto=format&fit=crop&w=800&q=80',
+    strategy: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=800&q=80',
+    marketing: 'https://images.unsplash.com/photo-1533750516457-a7f992034fec?auto=format&fit=crop&w=800&q=80',
+    modernization: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
+    default: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=80',
+};
+
+function getImageForTopic(title, category, scrapedImage) {
+    // If scraped image looks valid (e.g. from known reliable CDNs), try to use it
+    // But for this fix, we prioritize reliability over exact match if scraped one might be hotlink-blocked
+    // IBM Assets (assets.ibm.com) usually work, but let's be safe.
+
+    const text = (title + ' ' + category).toLowerCase();
+
+    // Service-specific matches (high priority)
+    if (text.includes('finance') || text.includes('fintech')) return FALLBACK_IMAGES.finance;
+    if (text.includes('supply') || text.includes('chain') || text.includes('logistics')) return FALLBACK_IMAGES.supply;
+    if (text.includes('talent') || text.includes('people') || text.includes('hr') || text.includes('workforce')) return FALLBACK_IMAGES.talent;
+    if (text.includes('experience') || text.includes('design') || text.includes('customer') || text.includes('ix')) return FALLBACK_IMAGES.experience;
+    if (text.includes('operations') || text.includes('business') || text.includes('process') || text.includes('operate')) return FALLBACK_IMAGES.operations;
+    if (text.includes('strategy') || text.includes('advise')) return FALLBACK_IMAGES.strategy;
+    if (text.includes('market') || text.includes('brand') || text.includes('commerce')) return FALLBACK_IMAGES.marketing;
+    if (text.includes('modern') || text.includes('app') || text.includes('legacy') || text.includes('build')) return FALLBACK_IMAGES.modernization;
+
+    // General topics
+    if (text.includes('ai') || text.includes('generative') || text.includes('intelligence')) return FALLBACK_IMAGES.ai;
+    if (text.includes('cloud') || text.includes('hybrid') || text.includes('openshift')) return FALLBACK_IMAGES.cloud;
+    if (text.includes('security') || text.includes('cyber') || text.includes('hack') || text.includes('trust')) return FALLBACK_IMAGES.cybersecurity;
+    if (text.includes('data') || text.includes('analytics') || text.includes('lakehouse')) return FALLBACK_IMAGES.data;
+    if (text.includes('auto') || text.includes('robot') || text.includes('efficient')) return FALLBACK_IMAGES.automation;
+    if (text.includes('quantum') || text.includes('compute')) return FALLBACK_IMAGES.quantum;
+    if (text.includes('sustain') || text.includes('green') || text.includes('climate')) return FALLBACK_IMAGES.sustainability;
+    if (text.includes('consult') || text.includes('strat') || text.includes('transform')) return FALLBACK_IMAGES.consulting;
+
+    // Use scraped image if available and no specific topic match found, otherwise default
+    return scrapedImage || FALLBACK_IMAGES.default;
+}
+
 function extractImageUrl(src) {
     if (!src) return null;
     if (src.startsWith('http')) return src;
@@ -79,7 +131,7 @@ async function scrapeInsights() {
                     readTime: `${Math.floor(Math.random() * 8) + 4} min read`,
                     featured: articles.length < 3,
                     url: fullUrl,
-                    image: extractImageUrl(img),
+                    image: getImageForTopic(title, category || 'Technology', extractImageUrl(img)),
                 });
             }
         });
@@ -139,7 +191,7 @@ async function scrapeCaseStudies() {
                     ],
                     technologies: ['IBM Consulting', 'Cloud', 'AI'],
                     url: fullUrl,
-                    image: extractImageUrl(img),
+                    image: getImageForTopic(title, 'Case Study', extractImageUrl(img)),
                     featured: studies.length < 2,
                 });
             }
@@ -194,6 +246,7 @@ async function scrapeServices() {
                     description: description || `IBM Consulting ${title} services.`,
                     icon: serviceSlug,
                     url: fullUrl,
+                    image: getImageForTopic(title, 'Consulting Service', null),
                 });
             }
         });

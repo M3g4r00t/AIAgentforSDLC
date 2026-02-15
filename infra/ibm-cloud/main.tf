@@ -21,7 +21,7 @@ variable "region" {
 
 variable "resource_group" {
   description = "Resource Group Name"
-  default     = "default"
+  default     = "Default"
 }
 
 # ─── Provider ───────────────────────────────────────
@@ -45,12 +45,14 @@ resource "ibm_code_engine_project" "project" {
 resource "ibm_code_engine_app" "backend" {
   project_id      = ibm_code_engine_project.project.project_id
   name            = "ibm-consulting-api"
-  image_reference = "icr.io/codeengine/helloworld" # Replaced by CI/CD after first push
-  image_port      = 4000
-  scale_min       = 1
-  scale_max       = 5
+  image_reference = "icr.io/codeengine/helloworld"
+  image_port      = 8080
+
+  scale_min_instances = 1
+  scale_max_instances = 5
 
   run_env_variables {
+    type  = "literal"
     name  = "NODE_ENV"
     value = "production"
   }
@@ -60,14 +62,16 @@ resource "ibm_code_engine_app" "backend" {
 resource "ibm_code_engine_app" "frontend" {
   project_id      = ibm_code_engine_project.project.project_id
   name            = "ibm-consulting-web"
-  image_reference = "icr.io/codeengine/helloworld" # Replaced by CI/CD after first push
-  image_port      = 3000
-  scale_min       = 1
-  scale_max       = 5
+  image_reference = "icr.io/codeengine/helloworld"
+  image_port      = 8080
+
+  scale_min_instances = 1
+  scale_max_instances = 5
 
   run_env_variables {
+    type  = "literal"
     name  = "NEXT_PUBLIC_API_URL"
-    value = ibm_code_engine_app.backend.endpoint
+    value = "placeholder"
   }
 }
 
