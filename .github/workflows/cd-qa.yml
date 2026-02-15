@@ -51,13 +51,35 @@ jobs:
 
       - name: Deploy Backend QA
         run: |
-          ibmcloud ce app update \
-            --name ibm-consulting-api-qa \
-            --image ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ibm-consulting-api:qa-latest
+          if ibmcloud ce app get --name ibm-consulting-api-qa > /dev/null 2>&1; then
+            echo "App exists, updating..."
+            ibmcloud ce app update \
+              --name ibm-consulting-api-qa \
+              --image ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ibm-consulting-api:qa-latest
+          else
+            echo "App does not exist, creating..."
+            ibmcloud ce app create \
+              --name ibm-consulting-api-qa \
+              --image ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ibm-consulting-api:qa-latest \
+              --min-scale 1 \
+              --registry-secret ibm-consulting-secret
+          fi
 
       - name: Deploy Frontend QA
         run: |
-          ibmcloud ce app update \
-            --name ibm-consulting-web-qa \
-            --image ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ibm-consulting-web:qa-latest \
-            --env NEXT_PUBLIC_API_URL=https://ibm-consulting-api-qa.26dwjxqdfb88.us-south.codeengine.appdomain.cloud
+          API_URL="https://ibm-consulting-api-qa.26dwjxqdfb88.us-south.codeengine.appdomain.cloud"
+          if ibmcloud ce app get --name ibm-consulting-web-qa > /dev/null 2>&1; then
+            echo "App exists, updating..."
+            ibmcloud ce app update \
+              --name ibm-consulting-web-qa \
+              --image ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ibm-consulting-web:qa-latest \
+              --env NEXT_PUBLIC_API_URL=$API_URL
+          else
+            echo "App does not exist, creating..."
+            ibmcloud ce app create \
+              --name ibm-consulting-web-qa \
+              --image ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ibm-consulting-web:qa-latest \
+              --min-scale 1 \
+              --registry-secret ibm-consulting-secret \
+              --env NEXT_PUBLIC_API_URL=$API_URL
+          fi

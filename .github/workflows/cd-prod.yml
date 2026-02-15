@@ -55,13 +55,35 @@ jobs:
 
       - name: Deploy Backend Prod
         run: |
-          ibmcloud ce app update \
-            --name ibm-consulting-api \
-            --image ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ibm-consulting-api:${{ github.sha }}
+          if ibmcloud ce app get --name ibm-consulting-api > /dev/null 2>&1; then
+            echo "App exists, updating..."
+            ibmcloud ce app update \
+              --name ibm-consulting-api \
+              --image ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ibm-consulting-api:${{ github.sha }}
+          else
+            echo "App does not exist, creating..."
+            ibmcloud ce app create \
+              --name ibm-consulting-api \
+              --image ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ibm-consulting-api:${{ github.sha }} \
+              --min-scale 1 \
+              --registry-secret ibm-consulting-secret
+          fi
 
       - name: Deploy Frontend Prod
         run: |
-          ibmcloud ce app update \
-            --name ibm-consulting-web \
-            --image ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ibm-consulting-web:${{ github.sha }} \
-            --env NEXT_PUBLIC_API_URL=https://ibm-consulting-api.26dwjxqdfb88.us-south.codeengine.appdomain.cloud
+          API_URL="https://ibm-consulting-api.26dwjxqdfb88.us-south.codeengine.appdomain.cloud"
+          if ibmcloud ce app get --name ibm-consulting-web > /dev/null 2>&1; then
+            echo "App exists, updating..."
+            ibmcloud ce app update \
+              --name ibm-consulting-web \
+              --image ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ibm-consulting-web:${{ github.sha }} \
+              --env NEXT_PUBLIC_API_URL=$API_URL
+          else
+            echo "App does not exist, creating..."
+            ibmcloud ce app create \
+              --name ibm-consulting-web \
+              --image ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/ibm-consulting-web:${{ github.sha }} \
+              --min-scale 1 \
+              --registry-secret ibm-consulting-secret \
+              --env NEXT_PUBLIC_API_URL=$API_URL
+          fi
